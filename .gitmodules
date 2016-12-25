@@ -1,0 +1,9 @@
+[submodule "vendor/github.com/pelletier/go-buffruneio"]
+	path = vendor/github.com/pelletier/go-buffruneio
+	url = https://github.com/pelletier/go-buffruneio
+[submodule "vendor/github.com/pelletier/go-toml"]
+	path = vendor/github.com/pelletier/go-toml
+	url = https://github.com/pelletier/go-toml
+[submodule "vendor/golang.org/x/crypto"]
+	path = vendor/golang.org/x/crypto
+	url = https://go.googlesource.com/crypto

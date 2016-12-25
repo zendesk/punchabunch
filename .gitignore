@@ -1,0 +1,5 @@
+*~
+*.sw[a-z]
+punchabunch
+.vscode/*
+vendor/*/

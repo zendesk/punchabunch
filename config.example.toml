@@ -1,0 +1,19 @@
+[staging-web]
+bastion = "bastion.staging.example.com"
+listen = "8080"
+forward = "web1.staging.example.com:80"
+
+[staging-db]
+bastion = "bastion.staging.example.com"
+listen = "13306"
+forward = "db1.staging.example.com:3306"
+
+[prod-web]
+bastion = "bastion.prod.example.com"
+listen = "28080"
+forward = "web1.prod.example.com:80"
+
+[prod-db]
+bastion = "bastion.prod.example.com"
+listen = "23306"
+forward = "db1.prod.example.com:3306"
