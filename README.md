@@ -20,9 +20,9 @@ Build instructions
 Usage
 -----
 ```
-punchabunch [-config config_file]
+punchabunch [-c config_file]
 
-  -config string
+  -c string
     	Path to configuration file (default "config.toml")
 ```
 

@@ -11,7 +11,6 @@ import (
 )
 
 func handleConn(clientConn net.Conn, sshClient *ssh.Client, proxyAddr string, remoteAddr string, verbose bool) {
-	defer clientConn.Close()
 	if verbose {
 		log.Printf("Requesting SSH server (%s) connect to %s...", proxyAddr, remoteAddr)
 	}
@@ -23,30 +22,38 @@ func handleConn(clientConn net.Conn, sshClient *ssh.Client, proxyAddr string, re
 	if verbose {
 		log.Printf("Connection to %s via %s established.", remoteAddr, proxyAddr)
 	}
-	defer remoteConn.Close()
-	done := make(chan bool)
+
+	remoteClosed := make(chan struct{})
 	go func() {
-		for {
-			len, err := io.Copy(clientConn, remoteConn)
-			if err != nil {
-				log.Fatalf("%s: %v", remoteAddr, err)
-			}
-			if len == 0 { // EOF
-				break
-			}
-		}
-		done <- true
-	}()
-	for {
-		len, err := io.Copy(remoteConn, clientConn)
+		_, err := io.Copy(clientConn, remoteConn)
 		if err != nil {
-			log.Fatalf("%s: %v", clientConn.LocalAddr().String(), err)
+			log.Printf("%s: %v", remoteAddr, err)
 		}
-		if len == 0 { // EOF
-			break
+		remoteConn.Close()
+		clientConn.Close()
+		close(remoteClosed)
+	}()
+
+	localClosed := make(chan struct{})
+	go func() {
+		_, err := io.Copy(remoteConn, clientConn)
+		if err != nil {
+			log.Printf("%s: %v", remoteAddr, err)
+		}
+		clientConn.Close()
+		remoteConn.Close()
+		close(localClosed)
+	}()
+
+	for remoteClosed != nil || localClosed != nil {
+		select {
+		case <-remoteClosed:
+			remoteClosed = nil
+		case <-localClosed:
+			localClosed = nil
 		}
 	}
-	<-done
+
 	if verbose {
 		log.Printf("Connection to %s via %s closed.", remoteAddr, proxyAddr)
 	}
