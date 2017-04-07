@@ -16,6 +16,8 @@ Build instructions
 1. Install Go, either from the [official distribution](https://golang.org/dl/) or via
    [Homebrew](http://brew.sh).
 1. Run `go get github.com/zendesk/punchabunch`
+1. `cd $GOPATH/src/github.com/zendesk/punchabunch`
+1. `make`
 
 Usage
 -----
