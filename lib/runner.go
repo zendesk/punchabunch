@@ -59,30 +59,9 @@ func handleConn(clientConn net.Conn, sshClient *ssh.Client, proxyAddr string, re
 	}
 }
 
+//Run loops through all the ssh forwarding configurations and starts the SSH sessions.
 func Run(c Config) {
-	// Sanity check
-	sockPath := os.Getenv("SSH_AUTH_SOCK")
-	if len(sockPath) == 0 {
-		log.Fatalf("Environment variable SSH_AUTH_SOCK not defined.  Is an SSH agent running?")
-	}
-	user := os.Getenv("LOGNAME")
-	if len(user) == 0 {
-		log.Fatalf("Environment variable LOGNAME not defined.  Set it to the login name you want to connect to the SSH server with.")
-	}
-
-	// Connect to agent socket
-	sockFile, err := net.Dial("unix", sockPath)
-	if err != nil {
-		log.Fatalf("Dial: %v", err)
-	}
-	agentClient := agent.NewClient(sockFile)
-
-	clientConfig := &ssh.ClientConfig{
-		User: user,
-		Auth: []ssh.AuthMethod{
-			ssh.PublicKeysCallback(agentClient.Signers),
-		},
-	}
+	clientConfig := initClient()
 
 	connectionsMade := 0
 
@@ -132,4 +111,31 @@ func Run(c Config) {
 			}
 		}(proxyAddr, connections)
 	}
+}
+
+func initClient() *ssh.ClientConfig {
+	// Sanity check
+	sockPath := os.Getenv("SSH_AUTH_SOCK")
+	if len(sockPath) == 0 {
+		log.Fatalf("Environment variable SSH_AUTH_SOCK not defined.  Is an SSH agent running?")
+	}
+	user := os.Getenv("LOGNAME")
+	if len(user) == 0 {
+		log.Fatalf("Environment variable LOGNAME not defined.  Set it to the login name you want to connect to the SSH server with.")
+	}
+
+	// Connect to agent socket
+	sockFile, err := net.Dial("unix", sockPath)
+	if err != nil {
+		log.Fatalf("Dial: %v", err)
+	}
+	agentClient := agent.NewClient(sockFile)
+
+	clientConfig := &ssh.ClientConfig{
+		User: user,
+		Auth: []ssh.AuthMethod{
+			ssh.PublicKeysCallback(agentClient.Signers),
+		},
+	}
+	return clientConfig
 }
