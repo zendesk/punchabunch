@@ -9,10 +9,16 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
+//AddressPair stores the listening address and the remote host address.
 type AddressPair struct {
+	//The address to which the ssh proxy will bind to while forwarding an incoming request.
 	ListenAddr string
+	//The destination address that listening port will forward incoming requests to.
 	RemoteAddr string
 }
+
+//Config contains the configuration map which stores the set of SSH and their corresponding forwarding configurations as well as
+//the setting for logging mode.
 type Config struct {
 	// If specified, this channel will be sent a `true` value after all
 	// connections to the SSH servers have been established.
@@ -24,6 +30,7 @@ type Config struct {
 	connections map[string][]AddressPair
 }
 
+//ParseConfig reads a configuration file in TOML from the given path and creates a Config struct from it.
 func ParseConfig(path string) (Config, error) {
 	var config Config
 	config.connections = make(map[string][]AddressPair)
