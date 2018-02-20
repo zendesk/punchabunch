@@ -7,7 +7,8 @@ punchabunch: deps punchabunch.go lib/*.go
 	go build
 
 deps:
-	go get github.com/kardianos/govendor
-	$(GOPATH)/bin/govendor sync
+	go get github.com/golang/dep/cmd/dep
+	$(GOPATH)/bin/dep ensure
+
 clean:
 	-rm -f punchabunch

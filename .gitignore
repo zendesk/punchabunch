@@ -3,4 +3,4 @@
 punchabunch
 *.zip
 .vscode/*
-vendor/*/
+vendor/
