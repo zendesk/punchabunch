@@ -82,6 +82,7 @@ func Run(c Config) {
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeysCallback(agentClient.Signers),
 		},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 
 	connectionsMade := 0
